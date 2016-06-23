@@ -32,6 +32,7 @@ ul.sortable.wiki-link-container
             value!="{{ link.title }}"
         )
 
+ul.sortable.wiki-link-container
     li.new.hidden
         input(
             type="text"
@@ -45,9 +46,9 @@ a.add-button(
 )
     tg-svg(svg-icon="icon-add")
     span(translate="WIKI.NAVIGATION.ACTION_ADD_LINK")
-<% } %>        
+<% } %>
 
-ul.wiki-link-container
+ul.wiki-link-container.wiki-all-links
     li.wiki-link.fixed-link
         a.link-title(
             href=""

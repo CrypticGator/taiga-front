@@ -7,7 +7,6 @@
     }
     .add-button {
         align-items: center;
-        border-bottom: 1px solid $gray-light;
         display: flex;
         padding: 1rem 1rem 1rem 2rem;
         text-transform: uppercase;
@@ -29,6 +28,9 @@
     }
     .wiki-link-container {
         margin: 0;
+        &.wiki-all-links {
+            border-top: 1px solid $gray-light;
+        }
     }
     input[type="text"] {
         background: $whitish;
