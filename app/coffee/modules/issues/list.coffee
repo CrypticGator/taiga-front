@@ -110,6 +110,11 @@ class IssuesController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
         @.generateFilters()
 
     selectCustomFilter: (customFilter) ->
+        orderBy = @location.search().order_by
+
+        if orderBy
+            customFilter.filter.order_by = orderBy
+
         @.unselectFilter("page")
         @.replaceAllFilters(customFilter.filter)
         @.loadIssues()
@@ -327,6 +332,12 @@ class IssuesController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
     addIssuesInBulk: ->
         @rootscope.$broadcast("issueform:bulk", @scope.projectId)
 
+    getOrderBy: ->
+        if _.isString(@location.search().order_by)
+            return @location.search().order_by
+        else
+            return "created_date"
+
 
 module.controller("IssuesController", IssuesController)
 
@@ -422,30 +433,39 @@ IssuesDirective = ($log, $location, $template, $compile) ->
     linkOrdering = ($scope, $el, $attrs, $ctrl) ->
         # Draw the arrow the first time
 
-        #TODO
-        currentOrder = $ctrl.location.search("orderBy") or "created_date"
+        currentOrder = $ctrl.getOrderBy()
 
         if currentOrder
-            icon = if startswith(currentOrder, "-") then "icon-arrow-up" else "icon-arrow-bottom"
+            icon = if startswith(currentOrder, "-") then "icon-arrow-up" else "icon-arrow-down"
             colHeadElement = $el.find(".row.title > div[data-fieldname='#{trim(currentOrder, "-")}']")
-            colHeadElement.html("#{colHeadElement.html()}<span class='icon #{icon}'></span>")
+
+            svg = $("<tg-svg>").attr("svg-icon", icon)
+
+            colHeadElement.append(svg)
+            $compile(colHeadElement.contents())($scope);
 
         $el.on "click", ".row.title > div", (event) ->
             target = angular.element(event.currentTarget)
 
-            currentOrder = $ctrl.getUrlFilter("orderBy")
+            currentOrder = $ctrl.getOrderBy()
             newOrder = target.data("fieldname")
 
             finalOrder = if currentOrder == newOrder then "-#{newOrder}" else newOrder
 
             $scope.$apply ->
-                $ctrl.replaceFilter("orderBy", finalOrder)
-                $ctrl.storeFilters()
+                $ctrl.replaceFilter("order_by", finalOrder)
+
+                $ctrl.storeFilters($ctrl.params.pslug, $location.search(), $ctrl.filtersHashSuffix)
                 $ctrl.loadIssues().then ->
                     # Update the arrow
-                    $el.find(".row.title > div > span.icon").remove()
-                    icon = if startswith(finalOrder, "-") then "icon-arrow-up" else "icon-arrow-bottom"
-                    target.html("#{target.html()}<span class='icon #{icon}'></span>")
+                    $el.find(".row.title > div > tg-svg").remove()
+                    icon = if startswith(finalOrder, "-") then "icon-arrow-up" else "icon-arrow-down"
+
+                    svg = $("<tg-svg>")
+                        .attr("svg-icon", icon)
+
+                    target.append(svg)
+                    $compile(target.contents())($scope);
 
     ## Issues Link
     link = ($scope, $el, $attrs) ->
