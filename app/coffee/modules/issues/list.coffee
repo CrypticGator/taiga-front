@@ -228,37 +228,37 @@ class IssuesController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
 
             @.filters = [
                 {
-                    title: @translate.instant("ISSUES.FILTERS.CATEGORIES.TYPE"),
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.TYPE"),
                     dataType: "type",
                     content: type
                 },
                 {
-                    title: @translate.instant("ISSUES.FILTERS.CATEGORIES.SEVERITY"),
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.SEVERITY"),
                     dataType: "severity",
                     content: severity
                 },
                 {
-                    title: @translate.instant("ISSUES.FILTERS.CATEGORIES.PRIORITIES"),
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.PRIORITIES"),
                     dataType: "priority",
                     content: priority
                 },
                 {
-                    title: @translate.instant("ISSUES.FILTERS.CATEGORIES.STATUS"),
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.STATUS"),
                     dataType: "status",
                     content: statuses
                 },
                 {
-                    title: @translate.instant("ISSUES.FILTERS.CATEGORIES.TAGS"),
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.TAGS"),
                     dataType: "tags",
                     content: tags
                 },
                 {
-                    title: @translate.instant("ISSUES.FILTERS.CATEGORIES.ASSIGNED_TO"),
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.ASSIGNED_TO"),
                     dataType: "assigned_to",
                     content: assignedTo
                 },
                 {
-                    title: @translate.instant("ISSUES.FILTERS.CATEGORIES.CREATED_BY"),
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.CREATED_BY"),
                     dataType: "owner",
                     content: owner
                 }

@@ -57,17 +57,21 @@ class BacklogController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.F
         "$tgLoading",
         "tgResources",
         "$tgQueueModelTransformation",
-        "tgErrorHandlingService"
+        "tgErrorHandlingService",
+        "$tgStorage",
+        "tgFilterRemoteStorageService"
     ]
 
     constructor: (@scope, @rootscope, @repo, @confirm, @rs, @params, @q, @location, @appMetaService, @navUrls,
-                  @events, @analytics, @translate, @loading, @rs2, @modelTransform, @errorHandlingService) ->
+                  @events, @analytics, @translate, @loading, @rs2, @modelTransform, @errorHandlingService, @storage, @filterRemoteStorageService) ->
         bindMethods(@)
 
         @.page = 1
         @.disablePagination = false
         @.firstLoadComplete = false
         @scope.userstories = []
+
+        return if @.applyStoredFilters(@params.pslug, "backlog-filters")
 
         @scope.sectionName = @translate.instant("BACKLOG.SECTION_NAME")
         @showTags = false
@@ -96,6 +100,130 @@ class BacklogController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.F
 
         # On Error
         promise.then null, @.onInitialDataError.bind(@)
+
+    changeQ: (q) ->
+        @.replaceFilter("q", q)
+        @.loadUserstories(true)
+        @.generateFilters()
+
+    removeFilter: (filter) ->
+        @.unselectFilter(filter.dataType, filter.id)
+        @.loadUserstories(true)
+        @.generateFilters()
+
+    addFilter: (newFilter) ->
+        @.selectFilter(newFilter.category.dataType, newFilter.filter.id)
+        @.loadUserstories(true)
+        @.generateFilters()
+
+    selectCustomFilter: (customFilter) ->
+        @.replaceAllFilters(customFilter.filter)
+        @.loadUserstories(true)
+        @.generateFilters()
+
+    saveCustomFilter: (name) ->
+        filters = {}
+        urlfilters = @location.search()
+        filters.tags = urlfilters.tags
+        filters.status = urlfilters.status
+        filters.assigned_to = urlfilters.assigned_to
+        filters.owner = urlfilters.owner
+
+        @filterRemoteStorageService.getFilters(@scope.projectId, 'backlog-custom-filters').then (userFilters) =>
+            userFilters[name] = filters
+
+            @filterRemoteStorageService.storeFilters(@scope.projectId, userFilters, 'backlog-custom-filters').then(@.generateFilters)
+
+    generateFilters: ->
+        @.storeFilters(@params.pslug, @location.search(), "backlog-filters")
+
+        urlfilters = @location.search()
+
+        loadFilters = {}
+        loadFilters.project = @scope.projectId
+        loadFilters.tags = urlfilters.tags
+        loadFilters.status = urlfilters.status
+        loadFilters.assigned_to = urlfilters.assigned_to
+        loadFilters.owner = urlfilters.owner
+        loadFilters.q = urlfilters.q
+        loadFilters.milestone = "null"
+
+        return @q.all([
+            @rs.userstories.filtersData(loadFilters),
+            @filterRemoteStorageService.getFilters(@scope.projectId, 'backlog-custom-filters')
+        ]).then (result) =>
+            data = result[0]
+            customFiltersRaw = result[1]
+
+            statuses = _.map data.statuses, (it) ->
+                it.id = it.id.toString()
+
+                return it
+            tags = _.map data.tags, (it) ->
+                it.id = it.name
+
+                return it
+            assignedTo = _.map data.assigned_to, (it) ->
+                if it.id
+                    it.id = it.id.toString()
+                else
+                    it.id = "null"
+
+                it.name = it.full_name || "Unassigned"
+
+                return it
+            owner = _.map data.owners, (it) ->
+                it.id = it.id.toString()
+                it.name = it.full_name
+
+                return it
+
+            @.selectedFilters = []
+
+            if loadFilters.status
+                selected = @.formatSelectedFilters("status", statuses, loadFilters.status)
+                @.selectedFilters = @.selectedFilters.concat(selected)
+
+            if loadFilters.tags
+                selected = @.formatSelectedFilters("tags", tags, loadFilters.tags)
+                @.selectedFilters = @.selectedFilters.concat(selected)
+
+            if loadFilters.assigned_to
+                selected = @.formatSelectedFilters("assigned_to", assignedTo, loadFilters.assigned_to)
+                @.selectedFilters = @.selectedFilters.concat(selected)
+
+            if loadFilters.owner
+                selected = @.formatSelectedFilters("owner", owner, loadFilters.owner)
+                @.selectedFilters = @.selectedFilters.concat(selected)
+
+            @.filterQ = loadFilters.q
+
+            @.filters = [
+                {
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.STATUS"),
+                    dataType: "status",
+                    content: statuses
+                },
+                {
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.TAGS"),
+                    dataType: "tags",
+                    content: tags
+                },
+                {
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.ASSIGNED_TO"),
+                    dataType: "assigned_to",
+                    content: assignedTo
+                },
+                {
+                    title: @translate.instant("COMMON.FILTERS.CATEGORIES.CREATED_BY"),
+                    dataType: "owner",
+                    content: owner
+                }
+            ];
+
+            @.customFilters = []
+            _.forOwn customFiltersRaw, (value, key) =>
+                @.customFilters.push({id: key, name: key, filter: value})
 
     initializeEventHandlers: ->
         @scope.$on "usform:bulk:success", =>
@@ -221,47 +349,6 @@ class BacklogController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.F
 
             return sprints
 
-    restoreFilters: ->
-        selectedTags = @scope.oldSelectedTags
-        selectedStatuses = @scope.oldSelectedStatuses
-
-        return if !selectedStatuses and !selectedStatuses
-
-        @scope.filtersQ = @scope.filtersQOld
-
-        @.replaceFilter("q", @scope.filtersQ)
-
-        _.each [selectedTags, selectedStatuses], (filterGrp) =>
-            _.each filterGrp, (item) =>
-                filters = @scope.filters[item.type]
-                filter = _.find(filters, {id: item.id})
-                filter.selected = true
-
-                @.selectFilter(item.type, item.id)
-
-        @.loadUserstories()
-
-    resetFilters: ->
-        selectedTags = _.filter(@scope.filters.tags, "selected")
-        selectedStatuses = _.filter(@scope.filters.status, "selected")
-
-        @scope.oldSelectedTags = selectedTags
-        @scope.oldSelectedStatuses = selectedStatuses
-
-        @scope.filtersQOld = @scope.filtersQ
-        @scope.filtersQ = undefined
-        @.replaceFilter("q", @scope.filtersQ)
-
-        _.each [selectedTags, selectedStatuses], (filterGrp) =>
-            _.each filterGrp, (item) =>
-                filters = @scope.filters[item.type]
-                filter = _.find(filters, {id: item.id})
-                filter.selected = false
-
-                @.unselectFilter(item.type, item.id)
-
-        @.loadUserstories()
-
     loadAllPaginatedUserstories: () ->
         page = @.page
 
@@ -273,7 +360,7 @@ class BacklogController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.F
 
         @.loadingUserstories = true
         @.disablePagination = true
-        @scope.httpParams = @.getUrlFilters()
+        @scope.httpParams = @location.search()
         @rs.userstories.storeQueryParams(@scope.projectId, @scope.httpParams)
 
         if resetPagination
@@ -292,8 +379,6 @@ class BacklogController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.F
 
             # NOTE: Fix order of USs because the filter orderBy does not work propertly in the partials files
             @scope.userstories = @scope.userstories.concat(_.sortBy(userstories, "backlog_order"))
-
-            @.setSearchDataFilters()
 
             @.loadingUserstories = false
 
@@ -502,94 +587,9 @@ class BacklogController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.F
 
         return promise
 
-    isFilterSelected: (type, id) ->
-        if @searchdata[type]? and @searchdata[type][id]
-            return true
-        return false
-
-    setSearchDataFilters: () ->
-        urlfilters = @.getUrlFilters()
-
-        if urlfilters.q
-            @scope.filtersQ = @scope.filtersQ or urlfilters.q
-
-        @searchdata = {}
-        for name, value of urlfilters
-            if not @searchdata[name]?
-                @searchdata[name] = {}
-
-            for val in taiga.toString(value).split(",")
-                @searchdata[name][val] = true
-
-    getUrlFilters: ->
-        return _.pick(@location.search(), "status", "tags", "q")
-
-    generateFilters: ->
-        urlfilters = @.getUrlFilters()
-        @scope.filters =  {}
-
-        loadFilters = {}
-        loadFilters.project = @scope.projectId
-        loadFilters.tags = urlfilters.tags
-        loadFilters.status = urlfilters.status
-        loadFilters.q = urlfilters.q
-        loadFilters.milestone = 'null'
-
-        return @rs.userstories.filtersData(loadFilters).then (data) =>
-            choicesFiltersFormat = (choices, type, byIdObject) =>
-                _.map choices, (t) ->
-                    t.type = type
-                    return t
-
-            tagsFilterFormat = (tags) =>
-                return _.map tags, (t) ->
-                    t.id = t.name
-                    t.type = 'tags'
-                    return t
-
-            # Build filters data structure
-            @scope.filters.status = choicesFiltersFormat(data.statuses, "status", @scope.usStatusById)
-            @scope.filters.tags = tagsFilterFormat(data.tags)
-
-            selectedTags = _.filter(@scope.filters.tags, "selected")
-            selectedTags = _.map(selectedTags, "id")
-
-            selectedStatuses = _.filter(@scope.filters.status, "selected")
-            selectedStatuses = _.map(selectedStatuses, "id")
-
-            @.markSelectedFilters(@scope.filters, urlfilters)
-
-            #store query params
-            @rs.userstories.storeQueryParams(@scope.projectId, {
-                "status": selectedStatuses,
-                "tags": selectedTags,
-                "project": @scope.projectId
-                "milestone": null
-            })
-
-    markSelectedFilters: (filters, urlfilters) ->
-        # Build selected filters (from url) fast lookup data structure
-        searchdata = {}
-        for name, value of _.omit(urlfilters, "page", "orderBy")
-            if not searchdata[name]?
-                searchdata[name] = {}
-
-            for val in "#{value}".split(",")
-                searchdata[name][val] = true
-
-        isSelected = (type, id) ->
-            if searchdata[type]? and searchdata[type][id]
-                return true
-            return false
-
-        for key, value of filters
-            for obj in value
-                obj.selected = if isSelected(obj.type, obj.id) then true else undefined
-
     ## Template actions
 
     updateUserStoryStatus: () ->
-        @.setSearchDataFilters()
         @.generateFilters().then () =>
             @rootscope.$broadcast("filters:update")
             @.loadProjectStats()
@@ -807,8 +807,15 @@ BacklogDirective = ($repo, $rootscope, $translate) ->
             text = $translate.instant("BACKLOG.TAGS.SHOW")
             elm.text(text)
 
+    openFilterInit = ($scope, $el, $ctrl) ->
+        sidebar = $el.find("sidebar.backlog-filter")
+
+        sidebar.addClass("active")
+
+        $ctrl.activeFilters = true
+
     showHideFilter = ($scope, $el, $ctrl) ->
-        sidebar = $el.find("sidebar.filters-bar")
+        sidebar = $el.find("sidebar.backlog-filter")
         sidebar.one "transitionend", () ->
             timeout 150, ->
                 $rootscope.$broadcast("resize")
@@ -823,11 +830,6 @@ BacklogDirective = ($repo, $rootscope, $translate) ->
         showText = $translate.instant("BACKLOG.FILTERS.SHOW")
 
         toggleText(target, [hideText, showText])
-
-        if !sidebar.hasClass("active")
-            $ctrl.resetFilters()
-        else
-            $ctrl.restoreFilters()
 
         $ctrl.toggleActiveFilters()
 
@@ -847,11 +849,13 @@ BacklogDirective = ($repo, $rootscope, $translate) ->
         linkFilters($scope, $el, $attrs, $ctrl)
         linkDoomLine($scope, $el, $attrs, $ctrl)
 
-        filters = $ctrl.getUrlFilters()
+        filters = $ctrl.location.search()
         if filters.status ||
            filters.tags ||
-           filters.q
-            showHideFilter($scope, $el, $ctrl)
+           filters.q ||
+           filters.assigned_to ||
+           filters.owner
+            openFilterInit($scope, $el, $ctrl)
 
         $scope.$on "showTags", () ->
             showHideTags($ctrl)

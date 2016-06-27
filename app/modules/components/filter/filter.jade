@@ -1,18 +1,18 @@
 h1.surround
-    span.title(translate="ISSUES.FILTERS.TITLE")
+    span.title(translate="COMMON.FILTERS.TITLE")
 
 form.surround
     fieldset
         input(
             type="text",
-            placeholder="{{'ISSUES.FILTERS.INPUT_SEARCH_PLACEHOLDER' | translate}}",
+            placeholder="{{'COMMON.FILTERS.INPUT_PLACEHOLDER' | translate}}",
             ng-model="vm.q"
             ng-model-options="{ debounce: 200 }"
             ng-change="vm.changeQ()"
         )
         tg-svg.search-action(
             svg-icon="icon-search",
-            title="{{'ISSUES.FILTERS.TITLE_ACTION_SEARCH' | translate}}"
+            title="{{'COMMON.FILTERS.TITLE_ACTION_SEARCH' | translate}}"
         )
 
 .filters-step-cat
@@ -30,7 +30,7 @@ form.surround
             ng-if="vm.selectedFilters.length && !vm.customFilterForm"
             href="",
             title="{{'COMMON.SAVE' | translate}}",
-            translate="ISSUES.FILTERS.ACTION_SAVE_CUSTOM_FILTER"
+            translate="COMMON.FILTERS.ACTION_SAVE_CUSTOM_FILTER"
         )
 
         form(
@@ -41,7 +41,7 @@ form.surround
                 tg-autofocus
                 ng-model="vm.customFilterName"
                 type="text"
-                placeholder="{{'ISSUES.PLACEHOLDER_FILTER_NAME' | translate}}"
+                placeholder="{{'COMMON.PLACEHOLDER_FILTER_NAME' | translate}}"
             )
 
     .filters-cats
@@ -83,9 +83,9 @@ form.surround
                     ng-class="{selected: vm.isOpen('custom-filter')}"
                     ng-click="vm.toggleFilterCategory('custom-filter')"
                     href=""
-                    title="{{'ISSUES.FILTERS.CATEGORIES.CUSTOM_FILTERS' | translate}}"
+                    title="{{'COMMON.FILTERS.CATEGORIES.CUSTOM_FILTERS' | translate}}"
                 )
-                    span.title(translate="ISSUES.FILTERS.CATEGORIES.CUSTOM_FILTERS")
+                    span.title(translate="COMMON.FILTERS.CATEGORIES.CUSTOM_FILTERS")
                     tg-svg.ng-animate-disabled(
                         ng-if="!vm.isOpen('custom-filter')"
                         svg-icon="icon-arrow-right"
