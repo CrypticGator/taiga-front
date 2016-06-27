@@ -8,7 +8,11 @@ tg-filter {
     top: 0;
     width: 260px;
     z-index: 1;
-    .surround {
+    .filters-applied {
+        padding: 0 1rem 1rem;
+    }
+    .h1,
+    form {
         padding: 0 1rem;
     }
     input {

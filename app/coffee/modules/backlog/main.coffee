@@ -360,15 +360,15 @@ class BacklogController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.F
 
         @.loadingUserstories = true
         @.disablePagination = true
-        @scope.httpParams = @location.search()
-        @rs.userstories.storeQueryParams(@scope.projectId, @scope.httpParams)
+        params = _.clone(@location.search())
+        @rs.userstories.storeQueryParams(@scope.projectId, params)
 
         if resetPagination
             @.page = 1
 
-        @scope.httpParams.page = @.page
+        params.page = @.page
 
-        promise = @rs.userstories.listUnassigned(@scope.projectId, @scope.httpParams, pageSize)
+        promise = @rs.userstories.listUnassigned(@scope.projectId, params, pageSize)
 
         return promise.then (result) =>
             userstories = result[0]

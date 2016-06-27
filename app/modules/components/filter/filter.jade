@@ -1,7 +1,7 @@
-h1.surround
+h1
     span.title(translate="COMMON.FILTERS.TITLE")
 
-form.surround
+form
     fieldset
         input(
             type="text",
@@ -16,7 +16,7 @@ form.surround
         )
 
 .filters-step-cat
-    .filters-applied.surround
+    .filters-applied
         .single-filter.ng-animate-disabled(ng-repeat="it in vm.selectedFilters track by it.key")
             span.name(ng-attr-style="{{it.color ? 'border-left: 3px solid ' + it.color: ''}}") {{it.name}}
             a.remove-filter(

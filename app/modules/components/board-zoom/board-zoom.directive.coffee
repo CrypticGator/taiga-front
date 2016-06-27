@@ -20,7 +20,6 @@
 BoardZoomDirective = (storage) ->
     link = (scope, el, attrs, ctrl) ->
         scope.$watch 'value', (val) ->
-            console.log "zoom", val
             storage.set(scope.storage, val)
 
     return {
