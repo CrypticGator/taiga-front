@@ -102,6 +102,12 @@ class TaskboardController extends mixOf(taiga.Controller, taiga.PageMixin, taiga
         @.loadTasks()
         @.generateFilters()
 
+    removeCustomFilter: (customFilter) ->
+        @filterRemoteStorageService.getFilters(@scope.projectId, 'tasks-custom-filters').then (userFilters) =>
+            delete userFilters[customFilter.id]
+
+            @filterRemoteStorageService.storeFilters(@scope.projectId, userFilters, 'tasks-custom-filters').then(@.generateFilters)
+
     saveCustomFilter: (name) ->
         filters = {}
         urlfilters = @location.search()
@@ -332,7 +338,6 @@ class TaskboardController extends mixOf(taiga.Controller, taiga.PageMixin, taiga
             @taskboardTasksService.set(tasks)
 
     loadTaskboard: ->
-        console.log "Oooo"
         return @q.all([
             @.refreshTagsColors(),
             @.loadSprintStats(),

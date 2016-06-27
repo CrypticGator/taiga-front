@@ -133,6 +133,13 @@ class KanbanController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
 
             @filterRemoteStorageService.storeFilters(@scope.projectId, userFilters, 'kanban-custom-filters').then(@.generateFilters)
 
+    removeCustomFilter: (customFilter) ->
+        @filterRemoteStorageService.getFilters(@scope.projectId, 'kanban-custom-filters').then (userFilters) =>
+            delete userFilters[customFilter.id]
+
+            @filterRemoteStorageService.storeFilters(@scope.projectId, userFilters, 'kanban-custom-filters').then(@.generateFilters)
+            @.generateFilters()
+
     generateFilters: ->
         @.storeFilters(@params.pslug, @location.search(), "kanban-filters")
 

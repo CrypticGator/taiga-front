@@ -26,6 +26,7 @@ FilterDirective = () ->
             onAddFilter: "&",
             onSelectCustomFilter: "&",
             onRemoveFilter: "&",
+            onRemoveCustomFilter: "&",
             onSaveCustomFilter: "&",
             customFilters: "<",
             q: "<",

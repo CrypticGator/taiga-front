@@ -14,6 +14,7 @@ div.wrapper(tg-taskboard, ng-controller="TaskboardController as ctrl",
           on-save-custom-filter="ctrl.saveCustomFilter(name)"
           on-add-filter="ctrl.addFilter(filter)"
           on-select-custom-filter="ctrl.selectCustomFilter(filter)"
+          on-remove-custom-filter="ctrl.removeCustomFilter(filter)"
           on-remove-filter="ctrl.removeFilter(filter)"
           on-change-q="ctrl.changeQ(q)"
         )

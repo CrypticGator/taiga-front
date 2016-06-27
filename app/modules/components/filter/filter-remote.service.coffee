@@ -40,12 +40,10 @@ class FilterRemoteStorageService extends taiga.Service
             promise.then null, ->
                 deferred.reject()
         else
-            console.log "put ", "#{url}/#{hash}"
             promise = @http.put("#{url}/#{hash}", {key: hash, value:myFilters})
             promise.then (data) ->
                 deferred.resolve()
             promise.then null, (data) =>
-                console.log "post ", "#{url}"
                 innerPromise = @http.post("#{url}", {key: hash, value:myFilters})
                 innerPromise.then ->
                     deferred.resolve()

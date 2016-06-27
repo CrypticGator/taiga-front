@@ -46,6 +46,9 @@ class FilterController
     unselectFilter: (filter) ->
         @.onRemoveFilter({filter: filter})
 
+    unselectFilter: (filter) ->
+        @.onRemoveFilter({filter: filter})
+
     selectFilter: (filterCategory, filter) ->
         filter = {
             category: filterCategory
@@ -53,6 +56,9 @@ class FilterController
         }
 
         @.onAddFilter({filter: filter})
+
+    removeCustomFilter: (filter) ->
+        @.onRemoveCustomFilter({filter: filter})
 
     selectCustomFilter: (filter) ->
         @.onSelectCustomFilter({filter: filter})

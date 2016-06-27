@@ -121,6 +121,12 @@ class BacklogController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.F
         @.loadUserstories(true)
         @.generateFilters()
 
+    removeCustomFilter: (customFilter) ->
+        @filterRemoteStorageService.getFilters(@scope.projectId, 'backlog-custom-filters').then (userFilters) =>
+            delete userFilters[customFilter.id]
+
+            @filterRemoteStorageService.storeFilters(@scope.projectId, userFilters, 'backlog-custom-filters').then(@.generateFilters)
+
     saveCustomFilter: (name) ->
         filters = {}
         urlfilters = @location.search()

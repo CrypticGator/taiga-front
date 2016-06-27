@@ -120,6 +120,14 @@ class IssuesController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
         @.loadIssues()
         @.generateFilters()
 
+    removeCustomFilter: (customFilter) ->
+        console.log "oooo"
+        @filterRemoteStorageService.getFilters(@scope.projectId, @.myFiltersHashSuffix).then (userFilters) =>
+            console.log userFilters[customFilter.id]
+            delete userFilters[customFilter.id]
+
+            @filterRemoteStorageService.storeFilters(@scope.projectId, userFilters, @.myFiltersHashSuffix).then(@.generateFilters)
+
     saveCustomFilter: (name) ->
         filters = {}
         urlfilters = @location.search()

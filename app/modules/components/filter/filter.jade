@@ -41,7 +41,7 @@ form
                 tg-autofocus
                 ng-model="vm.customFilterName"
                 type="text"
-                placeholder="{{'COMMON.PLACEHOLDER_FILTER_NAME' | translate}}"
+                placeholder="{{'COMMON.FILTERS.PLACEHOLDER_FILTER_NAME' | translate}}"
             )
 
     .filters-cats
@@ -103,3 +103,8 @@ form
                         ng-click="vm.selectCustomFilter(it)"
                     )
                         span.name {{it.name}}
+                        a.remove-filter(
+                            ng-click="vm.removeCustomFilter(it)"
+                            href=""
+                        )
+                            tg-svg(svg-icon="icon-trash")

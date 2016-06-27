@@ -11,7 +11,7 @@ tg-filter {
     .filters-applied {
         padding: 0 1rem 1rem;
     }
-    .h1,
+    h1,
     form {
         padding: 0 1rem;
     }
@@ -69,7 +69,7 @@ tg-filter {
             color: $primary;
         }
     }
-    a {
+    .filters-cat-single {
         align-items: center;
         color: $grayer;
         display: flex;
@@ -87,12 +87,64 @@ tg-filter {
             }
         }
     }
-    .icon {
+    .icon-arrow-down {
         fill: currentColor;
         float: right;
         height: .9rem;
         opacity: 0;
         transition: opacity .2s ease-in;
         width: .9rem;
+    }
+}
+
+.single-filter {
+    @include font-type(text);
+    @include clearfix;
+    align-items: center;
+    background: darken($whitish, 10%); // Fallback
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: .5rem;
+    opacity: .5;
+    padding-right: .5rem;
+    position: relative;
+    &:hover {
+        color: $grayer;
+        opacity: 1;
+        transition: opacity .2s linear;
+    }
+    &.selected,
+    &.active {
+        color: $grayer;
+        opacity: 1;
+        transition: opacity .2s linear;
+    }
+    .name,
+    .number {
+        padding: 8px 10px;
+    }
+    .name {
+        @include ellipsis(100%);
+        display: block;
+        width: 100%;
+    }
+    .number {
+        background: darken($whitish, 20%); // Fallback
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+    .remove-filter {
+        display: block;
+        svg {
+            fill: $gray;
+            transition: fill .2s linear;
+        }
+        &:hover {
+            svg {
+                fill: $red;
+            }
+        }
     }
 }
