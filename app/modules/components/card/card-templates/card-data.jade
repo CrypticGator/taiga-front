@@ -1,4 +1,4 @@
-.card-data(ng-if="vm.zoom >= 2")
+.card-data(ng-if="vm.visible('extra_info')")
     span.card-estimation(
         ng-if="vm.item.getIn(['model', 'total_points']) === null",
         translate="US.NOT_ESTIMATED"
@@ -9,10 +9,10 @@
     .card-statistics
         .statistic.card-votes(ng-class="{'active': vm.item.getIn(['model', 'is_voter'])}")
             tg-svg(svg-icon="icon-upvote")
-            span 4
+            span {{vm.item.getIn(['model', 'total_voters'])}}
         .statistic.card-watchers
             tg-svg(svg-icon="icon-watch")
-            span 4
+            span {{vm.item.getIn(['model', 'watchers']).size}}
         .statistic.card-attachments(ng-if="vm.item.getIn(['model', 'attachments']).size")
            tg-svg(svg-icon="icon-attachment")
-           span 1
+           span {{vm.item.getIn(['model', 'attachments']).size}}

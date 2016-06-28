@@ -17,18 +17,12 @@
 # File: board-zoom.directive.coffee
 ###
 
-BoardZoomDirective = (storage) ->
-    link = (scope, el, attrs, ctrl) ->
-        scope.$watch 'value', (val) ->
-            storage.set(scope.storage, val)
-
+BoardZoomDirective = () ->
     return {
         scope: {
-            value: "=",
-            storage: "@"
+            value: "="
         },
-        templateUrl: 'components/board-zoom/board-zoom.html',
-        link: link
+        templateUrl: 'components/board-zoom/board-zoom.html'
     }
 
-angular.module('taigaComponents').directive("tgBoardZoom", ["$tgStorage", BoardZoomDirective])
+angular.module('taigaComponents').directive("tgBoardZoom", [BoardZoomDirective])

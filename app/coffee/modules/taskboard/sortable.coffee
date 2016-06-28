@@ -39,8 +39,12 @@ module = angular.module("taigaBacklog")
 
 TaskboardSortableDirective = ($repo, $rs, $rootscope) ->
     link = ($scope, $el, $attrs) ->
-        bindOnce $scope, "project", (project) ->
-            if not (project.my_permissions.indexOf("modify_us") > -1)
+        unwatch = $scope.$watch "usTasks", (usTasks) ->
+            return if !usTasks.size
+
+            unwatch()
+
+            if not ($scope.project.my_permissions.indexOf("modify_task") > -1)
                 return
 
             oldParentScope = null

@@ -28,11 +28,13 @@ cardDirective = () ->
         bindToController: true,
         templateUrl: "components/card/card.html",
         scope: {
+            onToggleFold: "&",
             onClickAssignedTo: "&",
             onClickEdit: "&",
             project: "=",
             item: "=",
             zoom: "=",
+            zoomLevel: "=",
             archived: "=",
             type: "@"
         }

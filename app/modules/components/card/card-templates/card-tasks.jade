@@ -1,4 +1,4 @@
-ul.card-tasks(ng-if="vm.zoom >= 4 && vm.item.getIn(['model', 'tasks']).size")
+ul.card-tasks(ng-if="vm.item.getIn(['model', 'tasks']).size && (vm.visible('related_tasks') || !vm.item.get('fold'))")
     li.card-task(tg-repeat="task in vm.item.getIn(['model', 'tasks'])")
         a(
             href="#"

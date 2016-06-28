@@ -63,7 +63,6 @@ class TaskboardController extends mixOf(taiga.Controller, taiga.PageMixin, taiga
     constructor: (@scope, @rootscope, @repo, @confirm, @rs, @rs2, @params, @q, @appMetaService, @location, @navUrls,
                   @events, @analytics, @translate, @errorHandlingService, @taskboardTasksService, @storage, @filterRemoteStorageService) ->
         bindMethods(@)
-        @.zoom = @storage.get("taskboard_zoom") or 0
         @scope.userstories = []
         @.openFilter = false
 
@@ -81,6 +80,10 @@ class TaskboardController extends mixOf(taiga.Controller, taiga.PageMixin, taiga
 
         taiga.defineImmutableProperty @.scope, "usTasks", () =>
             return @taskboardTasksService.usTasks
+
+    setZoom: (zoomLevel, zoom) ->
+        @.zoomLevel = zoomLevel
+        @.zoom = zoom
 
     changeQ: (q) ->
         @.replaceFilter("q", q)
@@ -410,6 +413,9 @@ class TaskboardController extends mixOf(taiga.Controller, taiga.PageMixin, taiga
         switch type
             when "standard" then @rootscope.$broadcast("taskform:new", @scope.sprintId, us?.id)
             when "bulk" then @rootscope.$broadcast("taskform:bulk", @scope.sprintId, us?.id)
+
+    toggleFold: (id) ->
+        @taskboardTasksService.toggleFold(id)
 
     changeTaskAssignedTo: (id) ->
         task = @taskboardTasksService.getTaskModel(id)

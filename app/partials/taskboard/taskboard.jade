@@ -24,10 +24,7 @@ div.wrapper(tg-taskboard, ng-controller="TaskboardController as ctrl",
                 span.green(tg-bo-bind="sprint.name")
                 span.date(tg-date-range="sprint.estimated_start,sprint.estimated_finish")
             .taskboard-actions
-                tg-board-zoom.board-zoom(
-                    value="ctrl.zoom"
-                    storage="taskboard_zoom"
-                )
+                tg-taskboard-zoom(on-zoom-change="ctrl.setZoom(zoomLevel, zoom)")
                 button.button-filter(
                     ng-class="{'button-filters-applied': !!ctrl.selectedFilters.length}"
                     ng-click="ctrl.openFilter = !ctrl.openFilter"

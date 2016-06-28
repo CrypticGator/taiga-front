@@ -1,6 +1,6 @@
 .card-unfold.ng-animate-disabled(
-    ng-if="vm.zoom >= 3",
+    ng-click="vm.toggleFold()"
+    ng-if="vm.visible('unfold')"
     role="button"
 )
-    //todo icon
     tg-svg(svg-icon="icon-view-more")

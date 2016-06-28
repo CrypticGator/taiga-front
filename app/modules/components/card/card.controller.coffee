@@ -20,6 +20,12 @@
 class CardController
     @.$inject = []
 
+    visible: (name) ->
+        return @.zoom.indexOf(name) != -1
+
+    toggleFold: () ->
+        @.onToggleFold({id: @.item.get('id')})
+
     getClosedTasks: () ->
         return @.item.getIn(['model', 'tasks']).filter (task) -> return task.get('is_closed');
 

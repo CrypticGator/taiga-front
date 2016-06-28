@@ -26,11 +26,16 @@ class KanbanUserstoriesService extends taiga.Service
         @.userstoriesRaw = []
         @.archivedStatus = []
         @.statusHide = []
+        @.unfoldUs = {}
         @.usByStatus = Immutable.Map()
 
     init: (project, usersById) ->
         @.project = project
         @.usersById = usersById
+
+    toggleFold: (usId) ->
+        @.unfoldUs[usId] = !!!@.unfoldUs[usId]
+        @.refresh()
 
     set: (userstories) ->
         @.userstoriesRaw = userstories
@@ -137,11 +142,10 @@ class KanbanUserstoriesService extends taiga.Service
 
     refresh: ->
         userstories = @.userstoriesRaw
-
         userstories = _.sortBy(userstories, "kanban_order")
-
         userstories = _.map userstories, (usModel) =>
             us = {}
+            us.fold = !@.unfoldUs[usModel.id]
             us.model = usModel.getAttrs()
             us.id = usModel.id
             us.assigned_to = @.usersById[usModel.assigned_to]

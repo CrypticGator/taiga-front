@@ -1,4 +1,4 @@
-.card-tags
+.card-tags(ng-if="vm.visible('tags')") 
     span.card-tag(
         tg-repeat="tag in vm.item.get('colorized_tags') track by tag.get('name')"
         style="background-color: {{tag.get('color')}}" 

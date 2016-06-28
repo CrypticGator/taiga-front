@@ -47,17 +47,6 @@ $column-margin: 0 10px 0 0;
     height: 100%;
     overflow: hidden;
     width: 100%;
-    .taskboard-task {
-        &.readonly {
-            cursor: auto;
-        }
-        &.gu-mirror {
-            opacity: 1;
-            .avatar-task-link {
-                display: none;
-            }
-        }
-    }
 }
 
 .taskboard-table-header {

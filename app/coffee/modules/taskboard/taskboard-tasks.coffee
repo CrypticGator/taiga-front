@@ -23,11 +23,16 @@ class TaskboardTasksService extends taiga.Service
     @.$inject = []
     constructor: () ->
         @.tasksRaw = []
+        @.unfoldTask = {}
         @.usTasks = Immutable.Map()
 
     init: (project, usersById) ->
         @.project = project
         @.usersById = usersById
+
+    toggleFold: (taskId) ->
+        @.unfoldTask[taskId] = !!!@.unfoldTask[taskId]
+        @.refresh()
 
     add: (task) ->
         @.tasksRaw = @.tasksRaw.concat(task)
@@ -126,10 +131,10 @@ class TaskboardTasksService extends taiga.Service
             for status in taskStatusList
                 usTasks[us.id][status.id] = []
 
-        console.log tasks
         for taskModel in tasks
             if usTasks[taskModel.user_story]? and usTasks[taskModel.user_story][taskModel.status]?
                 task = {}
+                task.fold = !@.unfoldTask[taskModel.id]
                 task.model = taskModel.getAttrs()
                 task.id = taskModel.id
                 task.assigned_to = @.usersById[taskModel.assigned_to]
@@ -138,7 +143,7 @@ class TaskboardTasksService extends taiga.Service
                     return {name: tag, color: color}
 
                 usTasks[taskModel.user_story][taskModel.status].push(task)
-        console.log usTasks
+
         @.usTasks = Immutable.fromJS(usTasks)
 
 angular.module("taigaKanban").service("tgTaskboardTasks", TaskboardTasksService)

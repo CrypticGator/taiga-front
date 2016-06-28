@@ -13,6 +13,9 @@ $column-margin: 0 10px 0 0;
     overflow: hidden;
     width: 100%;
     .vfold {
+        tg-card {
+            display: none;
+        }
         &.task-colum-name {
             align-items: center;
             display: flex;

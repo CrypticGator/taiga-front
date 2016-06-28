@@ -34,15 +34,6 @@ bindMethods = @.taiga.bindMethods
 
 module = angular.module("taigaKanban")
 
-# Vars
-
-defaultViewMode = "maximized"
-viewModes = [
-    "maximized",
-    "minimized"
-]
-
-
 #############################################################################
 ## Kanban Controller
 #############################################################################
@@ -74,13 +65,11 @@ class KanbanController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
                   @appMetaService, @navUrls, @events, @analytics, @translate, @errorHandlingService,
                   @model, @kanbanUserstoriesService, @storage, @filterRemoteStorageService) ->
         bindMethods(@)
-        @.zoom = @storage.get("kanban_zoom") or 0
         @.openFilter = false
 
         return if @.applyStoredFilters(@params.pslug, "kanban-filters")
 
         @scope.sectionName = @translate.instant("KANBAN.SECTION_NAME")
-        @scope.statusViewModes = {}
         @.initializeEventHandlers()
 
         promise = @.loadInitialData()
@@ -99,6 +88,10 @@ class KanbanController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
 
         taiga.defineImmutableProperty @.scope, "usByStatus", () =>
             return @kanbanUserstoriesService.usByStatus
+
+    setZoom: (zoomLevel, zoom) ->
+        @.zoomLevel = zoomLevel
+        @.zoom = zoom
 
     changeQ: (q) ->
         @.replaceFilter("q", q)
@@ -278,6 +271,9 @@ class KanbanController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
 
         return false
 
+    toggleFold: (id) ->
+        @kanbanUserstoriesService.toggleFold(id)
+
     isUsInArchivedHiddenStatus: (usId) ->
         return @kanbanUserstoriesService.isUsInArchivedHiddenStatus(usId)
 
@@ -285,8 +281,6 @@ class KanbanController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
         us = @kanbanUserstoriesService.getUsModel(id)
 
         @rootscope.$broadcast("assigned-to:add", us)
-
-    # Scope Events Handlers
 
     onAssignedToChanged: (ctx, userid, usModel) ->
         usModel.assigned_to = userid
@@ -354,8 +348,6 @@ class KanbanController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
             @scope.usStatusById = groupBy(project.us_statuses, (x) -> x.id)
             @scope.usStatusList = _.sortBy(project.us_statuses, "order")
 
-            @.generateStatusViewModes()
-
             @scope.$emit("project:loaded", project)
             return project
 
@@ -371,35 +363,6 @@ class KanbanController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
             @.initializeSubscription()
             @.loadKanban()
             @.generateFilters()
-
-
-    ## View Mode methods
-
-    generateStatusViewModes: ->
-        storedStatusViewModes = @rs.kanban.getStatusViewModes(@scope.projectId)
-
-        @scope.statusViewModes = {}
-        for status in @scope.usStatusList
-            mode = storedStatusViewModes[status.id] || defaultViewMode
-
-            @scope.statusViewModes[status.id] = mode
-
-        @.storeStatusViewModes()
-
-    storeStatusViewModes: ->
-        @rs.kanban.storeStatusViewModes(@scope.projectId, @scope.statusViewModes)
-
-    updateStatusViewMode: (statusId, newViewMode) ->
-        @scope.statusViewModes[statusId] = newViewMode
-        @.storeStatusViewModes()
-
-    isMaximized: (statusId) ->
-        mode = @scope.statusViewModes[statusId] or defaultViewMode
-        return mode == 'maximized'
-
-    isMinimized: (statusId) ->
-        mode = @scope.statusViewModes[statusId] or defaultViewMode
-        return mode == 'minimized'
 
     # Utils methods
 
@@ -537,7 +500,6 @@ module.directive("tgKanbanArchivedStatusIntro", ["$translate", "tgKanbanUserstor
 #############################################################################
 
 KanbanSquishColumnDirective = (rs) ->
-
     link = ($scope, $el, $attrs) ->
         $scope.$on "project:loaded", (event, project) ->
             $scope.folds = rs.kanban.getStatusColumnModes(project.id)
