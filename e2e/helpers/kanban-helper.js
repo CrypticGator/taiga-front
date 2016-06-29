@@ -22,6 +22,10 @@ helper.getBoxUss = function(column) {
     return helper.getColumns().get(column).$$('tg-card');
 };
 
+helper.getUss = function() {
+    return $$('tg-card')
+};
+
 helper.editUs = async function(column, us) {
     let editionZone = helper.getColumns().get(column).$$('.card-owner-actions').get(us);
 
@@ -77,7 +81,7 @@ helper.watchersLinks = function() {
 helper.zoom = async function(level) {
     return  browser
         .actions()
-        .mouseMove($('tg-board-zoom'), {y: 10, x: level * 74})
+        .mouseMove($('tg-board-zoom'), {y: 14, x: level * 49})
         .click()
         .perform();
 };

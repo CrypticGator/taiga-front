@@ -25,7 +25,7 @@ div.wrapper(tg-taskboard, ng-controller="TaskboardController as ctrl",
                 span.date(tg-date-range="sprint.estimated_start,sprint.estimated_finish")
             .taskboard-actions
                 tg-taskboard-zoom(on-zoom-change="ctrl.setZoom(zoomLevel, zoom)")
-                button.button-filter(
+                button.button-filter.e2e-open-filter(
                     ng-class="{'button-filters-applied': !!ctrl.selectedFilters.length}"
                     ng-click="ctrl.openFilter = !ctrl.openFilter"
                 )

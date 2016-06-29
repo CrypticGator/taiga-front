@@ -24,7 +24,7 @@ div.wrapper(tg-kanban, ng-controller="KanbanController as ctrl"
             .taskboard-actions
                 tg-kanban-board-zoom(on-zoom-change="ctrl.setZoom(zoomLevel, zoom)")
         
-                button.button-filter(
+                button.button-filter.e2e-open-filter(
                     ng-class="{'button-filters-applied': !!ctrl.selectedFilters.length}"
                     ng-click="ctrl.openFilter = !ctrl.openFilter"
                 )
