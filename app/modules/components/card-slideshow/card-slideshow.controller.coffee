@@ -44,7 +44,7 @@ class CardSlideshowController
             return attachment.get('id') == image.get('id')
 
     previous: () ->
-        image = @.attachments.slice(0, @.index).find (attachment) ->
+        image = @.attachments.slice(0, @.index).findLast (attachment) ->
             return !!attachment.get('thumbnail_card_url')
 
         if !image
