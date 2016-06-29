@@ -22,6 +22,9 @@ groupBy = @.taiga.groupBy
 class TaskboardTasksService extends taiga.Service
     @.$inject = []
     constructor: () ->
+        @.reset()
+
+    reset: () ->
         @.tasksRaw = []
         @.unfoldTask = {}
         @.usTasks = Immutable.Map()

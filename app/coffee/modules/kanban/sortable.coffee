@@ -40,8 +40,8 @@ module = angular.module("taigaKanban")
 
 KanbanSortableDirective = ($repo, $rs, $rootscope) ->
     link = ($scope, $el, $attrs) ->
-        unwatch = $scope.$watch "usByStatus", (usTasks) ->
-            return if !usTasks.size
+        unwatch = $scope.$watch "usByStatus", (usByStatus) ->
+            return if !usByStatus || !usByStatus.size
 
             unwatch()
 

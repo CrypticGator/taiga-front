@@ -63,6 +63,7 @@ class TaskboardController extends mixOf(taiga.Controller, taiga.PageMixin, taiga
     constructor: (@scope, @rootscope, @repo, @confirm, @rs, @rs2, @params, @q, @appMetaService, @location, @navUrls,
                   @events, @analytics, @translate, @errorHandlingService, @taskboardTasksService, @storage, @filterRemoteStorageService) ->
         bindMethods(@)
+        @taskboardTasksService.reset()
         @scope.userstories = []
         @.openFilter = false
 

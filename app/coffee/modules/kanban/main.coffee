@@ -65,6 +65,7 @@ class KanbanController extends mixOf(taiga.Controller, taiga.PageMixin, taiga.Fi
                   @appMetaService, @navUrls, @events, @analytics, @translate, @errorHandlingService,
                   @model, @kanbanUserstoriesService, @storage, @filterRemoteStorageService) ->
         bindMethods(@)
+        @kanbanUserstoriesService.reset()
         @.openFilter = false
 
         return if @.applyStoredFilters(@params.pslug, "kanban-filters")

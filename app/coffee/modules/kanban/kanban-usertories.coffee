@@ -23,6 +23,9 @@ class KanbanUserstoriesService extends taiga.Service
     @.$inject = []
 
     constructor: () ->
+        @.reset()
+        
+    reset: () ->
         @.userstoriesRaw = []
         @.archivedStatus = []
         @.statusHide = []

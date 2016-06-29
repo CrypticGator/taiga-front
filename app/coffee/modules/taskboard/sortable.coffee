@@ -40,7 +40,7 @@ module = angular.module("taigaBacklog")
 TaskboardSortableDirective = ($repo, $rs, $rootscope) ->
     link = ($scope, $el, $attrs) ->
         unwatch = $scope.$watch "usTasks", (usTasks) ->
-            return if !usTasks.size
+            return if !usTasks || !usTasks.size
 
             unwatch()
 
