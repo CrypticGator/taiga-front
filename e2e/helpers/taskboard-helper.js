@@ -16,6 +16,10 @@ helper.getBoxTasks = function(row, column) {
     return box.$$('tg-card');
 };
 
+helper.getTasks = function() {
+    return $$('tg-card');
+};
+
 helper.openNewTaskLb = function(row) {
     let us = helper.usertories().get(row);
 
