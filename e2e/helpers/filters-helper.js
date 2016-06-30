@@ -6,8 +6,14 @@ helper.getFilter = function() {
     return $('tg-filter');
 };
 
-helper.open = function() {
-    $('.e2e-open-filter').click();
+helper.open = async function() {
+    let isPresent = await $('.e2e-open-filter').isPresent();
+
+    if(isPresent) {
+        $('.e2e-open-filter').click();
+    } else {
+        return;
+    }
 
     var filter = helper.getFilter();
 

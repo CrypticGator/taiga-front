@@ -3,6 +3,7 @@ var backlogHelper = require('../../helpers').backlog;
 var taskboardHelper = require('../../helpers').taskboard;
 var commonHelper = require('../../helpers').common;
 var filterHelper = require('../../helpers/filters-helper');
+var sharedFilters = require('../../shared/filters');
 
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
@@ -316,70 +317,7 @@ describe('taskboard', function() {
         });
     });
 
-    describe('taskboard filters', function() {
-        before(async () => {
-            await filterHelper.open();
-
-            utils.common.takeScreenshot('taskboard', 'filters');
-        });
-
-        it('filter by ref', async () => {
-            await filterHelper.byText('xxxxyy');
-
-            let usLength = await taskboardHelper.getTasks().count();
-
-            await filterHelper.clearFilters();
-
-            expect(usLength).to.be.equal(0);
-        });
-
-        it('filter by category', async () => {
-            let usLength = await taskboardHelper.getTasks().count();
-
-            await filterHelper.firterByCategoryWithContent();
-
-            let newUsLength = await taskboardHelper.getTasks().count();
-
-            expect(usLength).to.be.above(newUsLength);
-
-            await filterHelper.clearFilters();
-
-            newUsLength = await taskboardHelper.getTasks().count();
-
-            expect(usLength).to.be.equal(newUsLength);
-        });
-
-        it('save custom filters', async () => {
-            let usLength = await taskboardHelper.getTasks().count();
-
-            filterHelper.openCustomFiltersCategory();
-
-            let customFiltersSize = await filterHelper.getCustomFilters().count();
-
-            await filterHelper.firterByCategoryWithContent();
-            await filterHelper.saveFilter("custom-filter");
-            await filterHelper.clearFilters();
-            await filterHelper.firterByLastCustomFilter();
-
-            let newUsLength = await taskboardHelper.getTasks().count();
-            let newCustomFiltersSize = await filterHelper.getCustomFilters().count();
-
-            expect(newUsLength).to.be.below(usLength);
-            expect(newCustomFiltersSize).to.be.equal(customFiltersSize + 1);
-
-            await filterHelper.clearFilters();
-        });
-
-        it('remove custom filters', async () => {
-            filterHelper.openCustomFiltersCategory();
-
-            let customFiltersSize = await filterHelper.getCustomFilters().count();
-
-            filterHelper.removeLastCustomFilter();
-
-            let newCustomFiltersSize = await filterHelper.getCustomFilters().count();
-
-            expect(newCustomFiltersSize).to.be.equal(customFiltersSize - 1);
-        });
-    });
+    describe('taskboard filters', sharedFilters.bind(this, 'taskboard', () => {
+        return taskboardHelper.getTasks().count();
+    }));
 });

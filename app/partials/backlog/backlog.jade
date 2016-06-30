@@ -52,15 +52,15 @@ div.wrapper(tg-backlog, ng-controller="BacklogController as ctrl",
                 )
                     tg-svg(svg-icon="icon-move")
                     span.text(translate="BACKLOG.MOVE_US_TO_LATEST_SPRINT")
-                a.trans-button(
-                    ng-if="userstories.length && !ctrl.activeFilters"
+                a.trans-button.e2e-open-filter(
+                    ng-if="!ctrl.activeFilters"
                     href=""
                     title="{{'BACKLOG.FILTERS.TOGGLE' | translate}}"
                     id="show-filters-button"
                     translate="BACKLOG.FILTERS.SHOW"
                 )
-                a.trans-button.active(
-                    ng-if="userstories.length && ctrl.activeFilters"
+                a.trans-button.active.e2e-open-filter(
+                    ng-if="ctrl.activeFilters"
                     href=""
                     title="{{'BACKLOG.FILTERS.HIDE' | translate}}"
                     id="show-filters-button"
