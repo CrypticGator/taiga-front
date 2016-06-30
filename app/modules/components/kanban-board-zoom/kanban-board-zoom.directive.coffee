@@ -17,9 +17,10 @@
 # File: kanban-board-zoom.directive.coffee
 ###
 
-KanbanBoardZoomDirective = (storage) ->
+KanbanBoardZoomDirective = (storage, projectService) ->
     link = (scope, el, attrs, ctrl) ->
         scope.zoomIndex = storage.get("kanban_zoom") or 0
+        scope.levels = 5
 
         zooms = [
             ["ref"],
@@ -43,6 +44,14 @@ KanbanBoardZoomDirective = (storage) ->
             zoom = getZoomView(zoomLevel)
             scope.onZoomChange({zoomLevel: zoomLevel, zoom: zoom})
 
+        unwatch = scope.$watch () ->
+            return projectService.project
+        , (project) ->
+            if project
+                if project.get('my_permissions').indexOf("view_tasks") == -1
+                    scope.levels = 4
+                unwatch()
+
     return {
         scope: {
             onZoomChange: "&"
@@ -51,9 +60,10 @@ KanbanBoardZoomDirective = (storage) ->
         <tg-board-zoom
             class="board-zoom"
             value="zoomIndex"
+            levels="levels"
         ></tg-board-zoom>
         """,
         link: link
     }
 
-angular.module('taigaComponents').directive("tgKanbanBoardZoom", ["$tgStorage", KanbanBoardZoomDirective])
+angular.module('taigaComponents').directive("tgKanbanBoardZoom", ["$tgStorage", "tgProjectService", KanbanBoardZoomDirective])

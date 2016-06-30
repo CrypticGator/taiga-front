@@ -21,6 +21,8 @@ TaskboardZoomDirective = (storage) ->
     link = (scope, el, attrs, ctrl) ->
         scope.zoomIndex = storage.get("taskboard_zoom") or 0
 
+        scope.levels = 4
+
         zooms = [
             ["ref"],
             ["subject"],
@@ -49,6 +51,7 @@ TaskboardZoomDirective = (storage) ->
         },
         template: """
         <tg-board-zoom
+            levels="levels"
             class="board-zoom"
             value="zoomIndex"
         ></tg-board-zoom>

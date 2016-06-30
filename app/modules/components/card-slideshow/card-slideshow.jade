@@ -1,4 +1,4 @@
-.card-slideshow
+.card-slideshow(ng-if="vm.attachments.size")
     tg-svg.slideshow-icon.slideshow-left(
         ng-click="vm.previous()"
         ng-if="vm.hasPagination()"
